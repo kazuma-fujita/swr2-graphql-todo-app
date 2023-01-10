@@ -6,8 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "codegen": "graphql-codegen --config codegen.ts"
+    "lint": "next lint"
   },
   "dependencies": {
     "@next/font": "13.1.1",
@@ -16,15 +15,10 @@
     "@types/react-dom": "18.0.10",
     "eslint": "8.30.0",
     "eslint-config-next": "13.1.1",
-    "graphql": "^16.6.0",
     "next": "13.1.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "swr": "^2.0.0",
     "typescript": "4.9.4"
-  },
-  "devDependencies": {
-    "@graphql-codegen/cli": "2.16.2",
-    "@graphql-codegen/client-preset": "1.2.4"
   }
 }
