@@ -1,24 +1,24 @@
 import { gql, request } from "graphql-request";
 import useSWR from "swr";
 
-type TodoResult = {
-  todos: Todos;
+type ListTodosQuery = {
+  todos: {
+    __typename: "TodosPage";
+    data: Array<{
+      __typename: "Todo";
+      id: string;
+      title: string;
+      completed: boolean;
+    }>;
+  };
 };
 
-type Todos = {
-  data: Todo[];
-};
-
-type Todo = {
-  id: string;
-  title: string;
-  completed: boolean;
-};
-
-const query = gql`
+export const listTodosQuery = gql`
   query {
     todos {
+      __typename
       data {
+        __typename
         id
         title
         completed
@@ -31,7 +31,7 @@ const fetcher = (query: string) =>
   request("https://graphqlzero.almansi.me/api", query);
 
 export const TodoList = () => {
-  const { data, error } = useSWR<TodoResult>(query, fetcher);
+  const { data, error } = useSWR<ListTodosQuery>(listTodosQuery, fetcher);
   console.log("data", data);
   return (
     <ul>
