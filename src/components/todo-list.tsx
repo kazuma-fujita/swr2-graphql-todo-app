@@ -3,7 +3,7 @@ import useSWR from "swr";
 
 export const graphqlEndpoint = "https://graphqlzero.almansi.me/api";
 
-type ListTodosQuery = {
+export type ListTodosQuery = {
   todos: {
     __typename: "TodosPage";
     data: Array<{
