@@ -1,6 +1,8 @@
 import { gql, request } from "graphql-request";
 import useSWR from "swr";
 
+export const graphqlEndpoint = "https://graphqlzero.almansi.me/api";
+
 type ListTodosQuery = {
   todos: {
     __typename: "TodosPage";
@@ -14,8 +16,8 @@ type ListTodosQuery = {
 };
 
 export const listTodosQuery = gql`
-  query {
-    todos {
+  query ($page: Int, $limit: Int) {
+    todos(options: { paginate: { page: $page, limit: $limit } }) {
       __typename
       data {
         __typename
@@ -28,19 +30,22 @@ export const listTodosQuery = gql`
 `;
 
 const fetcher = (query: string) =>
-  request("https://graphqlzero.almansi.me/api", query);
+  request(graphqlEndpoint, query, { page: 1, limit: 5 });
 
 export const TodoList = () => {
   const { data, error } = useSWR<ListTodosQuery>(listTodosQuery, fetcher);
   console.log("data", data);
   return (
-    <ul>
-      {data &&
-        data.todos.data.map((todo) => (
-          <li key={todo.id}>
-            No.{todo.id} {todo.title}
-          </li>
-        ))}
-    </ul>
+    <div>
+      {error && <span style={{ color: "red" }}>{error}</span>}
+      <ul>
+        {data &&
+          data.todos.data.map((todo) => (
+            <li key={todo.id}>
+              No.{todo.id} {todo.title}
+            </li>
+          ))}
+      </ul>
+    </div>
   );
 };
