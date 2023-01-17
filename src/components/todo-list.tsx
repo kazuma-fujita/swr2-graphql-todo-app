@@ -1,5 +1,6 @@
 import { gql, request } from "graphql-request";
 import useSWR from "swr";
+import styles from "../../styles/Home.module.css";
 
 export const graphqlEndpoint = "https://graphqlzero.almansi.me/api";
 
@@ -36,16 +37,14 @@ export const TodoList = () => {
   const { data, error } = useSWR<ListTodosQuery>(listTodosQuery, fetcher);
   console.log("data", data);
   return (
-    <div>
-      {error && <span style={{ color: "red" }}>{error}</span>}
-      <ul>
-        {data &&
-          data.todos.data.map((todo) => (
-            <li key={todo.id}>
-              No.{todo.id} {todo.title}
-            </li>
-          ))}
-      </ul>
-    </div>
+    <>
+      {error && <span className={styles.redText}>{error}</span>}
+      {data &&
+        data.todos.data.map((todo) => (
+          <div key={todo.id}>
+            No.{todo.id} {todo.title}
+          </div>
+        ))}
+    </>
   );
 };

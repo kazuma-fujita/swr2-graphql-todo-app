@@ -2,6 +2,7 @@ import { gql, request } from "graphql-request";
 import { useRef, useState } from "react";
 import useSWRMutation from "swr/mutation";
 import { graphqlEndpoint, ListTodosQuery, listTodosQuery } from "./todo-list";
+import styles from "../../styles/Home.module.css";
 
 const createTodoMutation = gql`
   mutation CreateTodo($title: String!) {
@@ -25,7 +26,10 @@ const createTodo = async (key: string, options: { arg: { title: string } }) => {
 
 export const CreateTodoForm = () => {
   const [validationError, setValidationError] = useState("");
-  const { trigger, isMutating } = useSWRMutation(listTodosQuery, createTodo);
+  const { trigger, isMutating, error } = useSWRMutation(
+    listTodosQuery,
+    createTodo
+  );
   const textboxRef = useRef<HTMLInputElement>(null);
 
   const handleButtonClick = () => {
@@ -34,10 +38,12 @@ export const CreateTodoForm = () => {
     }
     const inputtedText = textboxRef.current.value;
     console.log("inputData", inputtedText);
+    setValidationError("");
     if (!inputtedText) {
       setValidationError("Title field is required.");
       return;
     }
+
     trigger(
       { title: inputtedText },
       {
@@ -61,14 +67,15 @@ export const CreateTodoForm = () => {
   };
 
   return (
-    <div>
+    <>
       <input type="text" ref={textboxRef} />
       <button onClick={handleButtonClick} disabled={isMutating}>
-        Create
+        Create Todo
       </button>
+      {error && <span className={styles.redText}>{error}</span>}
       {validationError && (
-        <span style={{ color: "red" }}>{validationError}</span>
+        <span className={styles.redText}>{validationError}</span>
       )}
-    </div>
+    </>
   );
 };
