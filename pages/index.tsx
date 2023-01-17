@@ -1,10 +1,7 @@
 import Head from "next/head";
-import { Inter } from "@next/font/google";
-import styles from "../styles/Home.module.css";
 import { CreateTodoForm } from "../src/components/create-todo-form";
 import { TodoList } from "../src/components/todo-list";
-
-const inter = Inter({ subsets: ["latin"] });
+import styles from "../styles/Home.module.css";
 
 export default function Home() {
   return (

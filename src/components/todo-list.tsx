@@ -34,11 +34,17 @@ const fetcher = (query: string) =>
   request(graphqlEndpoint, query, { page: 1, limit: 5 });
 
 export const TodoList = () => {
-  const { data, error } = useSWR<ListTodosQuery>(listTodosQuery, fetcher);
+  const { data, isLoading, error } = useSWR<ListTodosQuery>(
+    listTodosQuery,
+    fetcher,
+    { revalidateOnFocus: false }
+  );
+
   console.log("data", data);
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div className={styles.redText}>{error}</div>;
   return (
     <>
-      {error && <span className={styles.redText}>{error}</span>}
       {data &&
         data.todos.data.map((todo) => (
           <div key={todo.id}>
