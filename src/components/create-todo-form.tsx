@@ -1,18 +1,11 @@
-import { gql, request } from "graphql-request";
+import { request } from "graphql-request";
 import { useRef, useState } from "react";
 import useSWRMutation from "swr/mutation";
-import { graphqlEndpoint, ListTodosQuery, listTodosQuery } from "./todo-list";
 import styles from "../../styles/Home.module.css";
-
-const createTodoMutation = gql`
-  mutation CreateTodo($title: String!) {
-    createTodo(input: { title: $title, completed: false }) {
-      id
-      title
-      completed
-    }
-  }
-`;
+import { displayError } from "../functions/utils";
+import { graphqlEndpoint, ListTodos } from "../graphql/API";
+import { createTodoMutation } from "../graphql/mutations";
+import { listTodosQuery } from "../graphql/queries";
 
 const createTodo = async (key: string, options: { arg: { title: string } }) => {
   const newTodo = await request(
@@ -20,7 +13,6 @@ const createTodo = async (key: string, options: { arg: { title: string } }) => {
     createTodoMutation,
     options.arg
   );
-  console.log("newTodo", newTodo);
   return newTodo;
 };
 
@@ -32,47 +24,51 @@ export const CreateTodoForm = () => {
   );
   const textboxRef = useRef<HTMLInputElement>(null);
 
-  const handleButtonClick = () => {
-    if (!textboxRef || !textboxRef.current) {
-      return;
-    }
-    const inputtedText = textboxRef.current.value;
-    console.log("inputData", inputtedText);
-    setValidationError("");
-    if (!inputtedText) {
-      setValidationError("Title field is required.");
-      return;
-    }
-
-    trigger(
-      { title: inputtedText },
+  const addTodo = async (title: string) => {
+    await trigger(
+      { title: title },
       {
-        optimisticData: (data: ListTodosQuery) =>
+        optimisticData: (cache: ListTodos) =>
           ({
             todos: {
               data: [
-                ...data.todos.data,
+                ...cache.todos.data,
                 {
-                  id: `${data.todos.data.length + 1}`,
-                  title: inputtedText,
+                  id: `${cache.todos.data.length + 1}`,
+                  title: title,
                   completed: false,
                 },
               ],
             },
-          } as ListTodosQuery),
+          } as ListTodos),
         rollbackOnError: true,
         revalidate: false,
       }
     );
   };
 
+  const onButtonClick = async () => {
+    if (!textboxRef || !textboxRef.current) {
+      return;
+    }
+
+    const inputtedText = textboxRef.current.value;
+    setValidationError("");
+    if (!inputtedText) {
+      setValidationError("Title field is required.");
+      return;
+    }
+
+    await addTodo(inputtedText);
+  };
+
+  if (error) return <div className={styles.redText}>{displayError(error)}</div>;
   return (
     <>
       <input type="text" ref={textboxRef} />
-      <button onClick={handleButtonClick} disabled={isMutating}>
+      <button onClick={onButtonClick} disabled={isMutating}>
         Create Todo
       </button>
-      {error && <span className={styles.redText}>{error}</span>}
       {validationError && (
         <span className={styles.redText}>{validationError}</span>
       )}
